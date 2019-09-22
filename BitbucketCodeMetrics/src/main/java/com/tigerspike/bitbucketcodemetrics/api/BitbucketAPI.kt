@@ -48,8 +48,8 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
         )
 
         result.values.forEach {
-            it.activity = loadActivity(user, repositorySlug, it).loadAll()
-            it.commits = loadCommits(user, repositorySlug, it).loadAll().sortedBy { it.date }
+            it.activity = loadActivity(user, repositorySlug, it).loadAll(10)
+            it.commits = loadCommits(user, repositorySlug, it).loadAll(10).sortedBy { it.date }
         }
 
         result.pageLoader = { pageToLoad ->

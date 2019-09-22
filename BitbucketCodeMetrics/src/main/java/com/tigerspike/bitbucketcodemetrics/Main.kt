@@ -23,7 +23,7 @@ fun main() {
 
             println("Downloading data. This will take a while...")
             val prs = api.fetchPullRequests(repositoryUsername, repositorySlug, PullRequest.State.MERGED, 50)
-                .loadAll()
+                .loadAll(limit = 5)
 
             val correlationMatrix = prs.correlationBetweenComponents()
 

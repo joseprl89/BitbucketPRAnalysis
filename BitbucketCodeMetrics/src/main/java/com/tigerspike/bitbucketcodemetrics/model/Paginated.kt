@@ -19,11 +19,20 @@ data class Paginated<T>(
         return next.toHttpUrlOrNull()?.queryParameter("page")
     }
 
-    suspend fun loadAll(): List<T> {
+    suspend fun loadAll(limit: Int? = null): List<T> {
+        var breakWhenZero = limit
         val allValues = mutableListOf<T>()
         var nextPage: Paginated<T>? = this
         do {
             nextPage?.let { allValues.addAll(it.values) }
+
+            breakWhenZero = breakWhenZero?.let {
+                if (it <= 1) {
+                    return allValues
+                }
+                return@let it - 1
+            }
+
             nextPage = nextPage?.loadNextPage()
         } while (nextPage != null)
         return allValues

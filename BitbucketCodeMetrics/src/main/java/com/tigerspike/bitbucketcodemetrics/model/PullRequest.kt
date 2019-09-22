@@ -93,5 +93,7 @@ fun List<PullRequest>.correlationBetweenComponents(): String {
 
     val correlationsToTimeToMerge = corrInstance.correlationMatrix.getColumn(0).drop(1)
 
-    return correlationsToTimeToMerge.zip(PullRequest.componentNames()) { correlation, name -> "$name:\t\t${"0.02f".format(correlation)}" }.joinToString(separator = "\n")
+    return correlationsToTimeToMerge.zip(PullRequest.componentNames()) { correlation, name -> "$name:\t\t${correlation.format(2)}" }.joinToString(separator = "\n")
 }
+
+fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
