@@ -49,32 +49,29 @@ The values can range from -1.0 to 1.0, where:
 
 Therefore, if a variable is close to 1, the team should take actions to reduce that variable, as it will result in an increase in the overall throughput of it. If, on the other hand, the value is close to -1, you want to maximise that variable.
 
-As an example, let's assume we use as input data three variables, time between first commit and merge of the PR, time between first commit and creation of the PR, and number of comments, using data like so:
+As an example, these are the results of a real repository I run the analysis on:
 
-| Seconds between first commit and merge | Seconds between first commit and creation of PR | comments |
-|----------------------------------------|-------------------------------------------------|----------|
-| 4000                                   | 3500                                            | 10       |
-| 8000                                   | 5000                                            | 20       |
-| 5000                                   | 2000                                            | 4        |
-| 1000                                   | 700                                             | 0        |
-| 600                                    | 200                                             | 0        |
+```
+Time between first commit and approval:		0.98
+Time between first commit and PR creation:		0.97
+Time between approval and merge:		0.33
+Merge commit count:		0.31
+Number of commits:		0.20
+Activity in PR:		0.15
+Time between creation and approval:		0.09
+Number of comments:		0.06
+Number of tasks:		NaN
+Using tasks:		NaN
+```
 
-Upon executing the PPMCC we'll have a square 3x3 Matrix defining how strongly correlated the variables are, where 1 means that the data is very positively correlated, and -1 that it's very negatively correlated.
+Based on these numbers we can see that:
 
-Example result (not accurate):
+* Altough obvious, the most significant correlation to the time from first commit to merge is the time from first commit to the PR creation and approval.
+* The time between approval and merge has a significant correlation.
+* The number of merge commits in the PR have a significant impact in the performance of the team
+* A higher activity in the PR weakly correlates in a positive manner to the time to merge.
 
-| Seconds between first commit and merge | Seconds between first commit and creation of PR | comments |
-|----------------------------------------|-------------------------------------------------|----------|
-| 1                                   | 0.7                                            | -0.3       |
-| 0.7                                   | 1                                            | -0.2       |
-| -0.3                                   | -0.2                                            | 1        |
-
-In this fictional result, we'd see that the time between first commit and merge is strongly positively correlated to time between first commit and creation of PR, and those two are negatively correlated to the number of comments.
-
-With this information, a team could aim to improve their performance by:
-
-* Taking actions to minimise the number of comments in a PR (e.g. pre-implementation analysis of the feature)
-* Taking actions to reduce the time it takes to create the PR (e.g. smaller batches)
+With these results, the team of the example could benefit from considering how to reduce the time between the first commit and creating and approving a PR, how to reduce the number of merge commits to perform and the activity in the PR. An example of such activities could be to reduce the batch size, or to catchup before the start of a feature to minimise the impact of integrating branches.
 
 ## Caveats
 
