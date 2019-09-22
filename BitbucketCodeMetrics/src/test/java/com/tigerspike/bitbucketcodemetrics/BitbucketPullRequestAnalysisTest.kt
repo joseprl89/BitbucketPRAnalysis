@@ -3,11 +3,13 @@ package com.tigerspike.bitbucketcodemetrics
 import com.tigerspike.bitbucketcodemetrics.api.BitbucketAPI
 import com.tigerspike.bitbucketcodemetrics.model.PullRequest
 import com.tigerspike.bitbucketcodemetrics.model.correlationBetweenComponents
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.linear.RealMatrix
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import kotlin.math.abs
 
 class BitbucketAPITest {
 

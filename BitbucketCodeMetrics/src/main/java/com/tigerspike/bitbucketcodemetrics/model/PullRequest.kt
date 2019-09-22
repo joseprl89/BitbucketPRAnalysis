@@ -4,6 +4,7 @@ import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
 import java.lang.Exception
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 
 data class PullRequest(
     val id: String,
@@ -93,7 +94,11 @@ fun List<PullRequest>.correlationBetweenComponents(): String {
 
     val correlationsToTimeToMerge = corrInstance.correlationMatrix.getColumn(0).drop(1)
 
-    return correlationsToTimeToMerge.zip(PullRequest.componentNames()) { correlation, name -> "$name:\t\t${correlation.format(2)}" }.joinToString(separator = "\n")
+    return correlationsToTimeToMerge
+        .zip(PullRequest.componentNames())
+        .sortedByDescending { if (it.first.isNaN()) -1.0 else abs(it.first) }
+        .map { "${it.second}:\t\t${it.first.format(2)}" }
+        .joinToString(separator = "\n")
 }
 
 fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
