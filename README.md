@@ -49,10 +49,6 @@ The values can range from -1.0 to 1.0, where:
 
 Therefore, if a variable is close to 1, the team should take actions to reduce that variable, as it will result in an increase in the overall throughput of it. If, on the other hand, the value is close to -1, you want to maximise that variable.
 
-For example, if the number of commits has a value of -1, and the number of comments of 1, you should aim to take actions to increase the number of commits and reduce the number of comments raised in the PR.
-
-### Example PPMCC analysis
-
 As an example, let's assume we use as input data three variables, time between first commit and merge of the PR, time between first commit and creation of the PR, and number of comments, using data like so:
 
 | Seconds between first commit and merge | Seconds between first commit and creation of PR | comments |
