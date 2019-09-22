@@ -37,7 +37,8 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
         repositorySlug: String,
         prState: PullRequest.State?,
         size: Int? = null,
-        page: String? = null
+        page: String? = null,
+        filterTargetBranch: String? = null
     ): Paginated<PullRequest> {
         val result = client.apiDefinition.listRepos(
             user,
@@ -47,13 +48,15 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
             page = page
         )
 
-        result.values.forEach {
-            it.activity = loadActivity(user, repositorySlug, it).loadAll(10)
-            it.commits = loadCommits(user, repositorySlug, it).loadAll(10).sortedBy { it.date }
-        }
+        result.values
+            .filter { filterTargetBranch == null || it.destination.branch.name == filterTargetBranch }
+            .forEach {
+                it.activity = loadActivity(user, repositorySlug, it).loadAll(10)
+                it.commits = loadCommits(user, repositorySlug, it).loadAll(10).sortedBy { it.date }
+            }
 
         result.pageLoader = { pageToLoad ->
-            fetchPullRequests(user, repositorySlug, prState, size, pageToLoad)
+            fetchPullRequests(user, repositorySlug, prState, size, pageToLoad, filterTargetBranch)
         }
 
         return result

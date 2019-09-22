@@ -3,7 +3,6 @@ package com.tigerspike.bitbucketcodemetrics
 import com.tigerspike.bitbucketcodemetrics.api.BitbucketAPI
 import com.tigerspike.bitbucketcodemetrics.model.PullRequest
 import com.tigerspike.bitbucketcodemetrics.model.correlationBetweenComponents
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.linear.RealMatrix
 import org.hamcrest.CoreMatchers.*
@@ -22,7 +21,13 @@ class BitbucketAPITest {
     @Test
     fun testBitbucketAPI() {
         runBlocking {
-            val pullRequests = sut.fetchPullRequests(user, repositorySlug, prState, size = 50).loadAll(
+            val pullRequests = sut.fetchPullRequests(
+                user,
+                repositorySlug,
+                prState,
+                size = 50,
+                filterTargetBranch = null
+            ).loadAll(
                 10
             )
             assertThat(pullRequests.count(), `is`(not(equalTo(0))))
