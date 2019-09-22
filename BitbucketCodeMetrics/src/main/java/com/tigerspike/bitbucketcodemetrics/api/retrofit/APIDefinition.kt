@@ -1,4 +1,4 @@
-package com.tigerspike.bitbucketcodemetrics.retrofit
+package com.tigerspike.bitbucketcodemetrics.api.retrofit
 
 import com.tigerspike.bitbucketcodemetrics.model.Activity
 import com.tigerspike.bitbucketcodemetrics.model.FullCommit
@@ -14,7 +14,7 @@ interface APIDefinition {
         @Path("user") user: String,
         @Path("repositorySlug") repositorySlug: String,
         @Query("state") status: String?,
-        @Query("page") page: Int?,
+        @Query("page") page: String?,
         @Query("pagelen") size: Int?
     ): Paginated<PullRequest>
 
@@ -24,7 +24,7 @@ interface APIDefinition {
         @Path("user") user: String,
         @Path("repositorySlug") repositorySlug: String,
         @Path("pullRequestId") pullRequestId: String,
-        @Query("page") page: Int?,
+        @Query("page") page: String?,
         @Query("pagelen") size: Int?
     ): Paginated<FullCommit>
 
@@ -33,7 +33,7 @@ interface APIDefinition {
         @Path("user") user: String,
         @Path("repositorySlug") repositorySlug: String,
         @Path("pullRequestId") pullRequestId: String,
-        @Query("page") page: Int?,
+        @Query("page") page: String?,
         @Query("pagelen") size: Int?
     ): Paginated<Activity>
 

@@ -24,8 +24,8 @@ data class PullRequest(
     val merge_commit: Commit,
     val closed_by: User
 ) {
-    lateinit var activity: List<Activity>
-    lateinit var commits: List<FullCommit>
+    var activity: List<Activity>? = null
+    var commits: List<FullCommit>? = null
 
     enum class State {
         MERGED, OPEN, SUPERSEDED, DECLINED
@@ -59,38 +59,39 @@ data class PullRequest(
             ChronoUnit.SECONDS.between(firstApproval, mergeTime).toDouble(),
             comment_count.toDouble(),
             task_count.toDouble(),
-            commits.size.toDouble(),
+            commits!!.size.toDouble(),
             if (task_count != 0) 1.0 else 0.0,
-            activity.count().toDouble(),
+            activity!!.count().toDouble(),
             mergeCommitCount()
         )
     }
 
-    private fun mergeCommitCount() = commits.count { it.parents.count() > 1 }.toDouble()
+    private fun mergeCommitCount() = commits!!.count { it.parents.count() > 1 }.toDouble()
 
-    private fun firstCommitDate() = commits.first().date
+    private fun firstCommitDate() = commits!!.first().date
 
     private fun mergeTime(): ZonedDateTime {
         try {
-            return activity.first { it.update?.state == State.MERGED }.update!!.date
+            return activity!!.first { it.update?.state == State.MERGED }.update!!.date
         } catch (e: Exception) {
             throw Exception("Failed to retrieve merge time for PR ${this.id} with activity: ${this.activity}", e)
         }
     }
 
     private fun firstApproval(): ZonedDateTime? {
-        return activity.mapNotNull { it.approval?.date }.min()
+        return activity?.mapNotNull { it.approval?.date }?.min()
     }
 
     fun isValid() = hasApprovals() && hasCommits()
     fun hasApprovals() = firstApproval() != null
-    fun hasCommits() = commits.isNotEmpty()
+    fun hasCommits() = commits!!.isNotEmpty()
 }
 
 fun List<PullRequest>.correlationBetweenComponents(): String {
-    val corrInstance = PearsonsCorrelation(filter { it.isValid() }.map { it.components() }.toTypedArray())
+    val pearsonCorrelationData = filter { it.isValid() }.map { it.components() }.toTypedArray()
+    val corrInstance = PearsonsCorrelation(pearsonCorrelationData)
 
     val correlationsToTimeToMerge = corrInstance.correlationMatrix.getColumn(0).drop(1)
 
-    return correlationsToTimeToMerge.zip(PullRequest.componentNames()) { correlation, name -> "$name: $correlation" }.joinToString(separator = "\n")
+    return correlationsToTimeToMerge.zip(PullRequest.componentNames()) { correlation, name -> "$name:\t\t${"0.02f".format(correlation)}" }.joinToString(separator = "\n")
 }

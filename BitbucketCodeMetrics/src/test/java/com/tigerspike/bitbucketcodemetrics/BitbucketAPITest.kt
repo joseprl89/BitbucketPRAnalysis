@@ -1,21 +1,23 @@
 package com.tigerspike.bitbucketcodemetrics
 
+import com.tigerspike.bitbucketcodemetrics.api.BitbucketAPI
+import com.tigerspike.bitbucketcodemetrics.api.Credentials
 import com.tigerspike.bitbucketcodemetrics.model.PullRequest
 import com.tigerspike.bitbucketcodemetrics.model.correlationBetweenComponents
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.linear.RealMatrix
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class BitbucketAPITest {
 
-    val user = "atlassian"
-    val repositorySlug = "teams-in-space-demo"
-    val prState = PullRequest.State.MERGED
+    private val user = "atlassian"
+    private val repositorySlug = "teams-in-space-demo"
+    private val prState = PullRequest.State.MERGED
 
-    val sut = BitbucketAPI.client()
+    private val sut = BitbucketAPI.builder()
+        .build()
 
     @Test
     fun testBitbucketAPI() {

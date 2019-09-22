@@ -1,24 +1,25 @@
 package com.tigerspike.bitbucketcodemetrics.model
 
-import java.lang.AssertionError
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 data class Paginated<T>(
     val pagelen: Int,
     val size: Int,
-    val page: Int,
+    val page: String,
     val next: String?,
     val values: List<T>
 ) {
-    fun hasNextPage() = pagelen * page < size || !next.isNullOrEmpty()
-    fun hasPreviousPage() = page > 1
+    fun hasNextPage() = !next.isNullOrEmpty()
 
-    lateinit var pageLoader: suspend (Int) -> Paginated<T>
-    suspend fun loadNextPage() = if (hasNextPage()) pageLoader(page + 1) else null
-    suspend fun loadPreviousPage() = if (hasPreviousPage()) pageLoader(page - 1) else null
+    lateinit var pageLoader: suspend (String) -> Paginated<T>
+    suspend fun loadNextPage() = extractNextPage()?.let { pageLoader(it) }
+
+    private fun extractNextPage(): String? {
+        if (next == null) return null
+        return next.toHttpUrlOrNull()?.queryParameter("page")
+    }
 
     suspend fun loadAll(): List<T> {
-        if (page != 1) return values
-
         val allValues = mutableListOf<T>()
         var nextPage: Paginated<T>? = this
         do {

@@ -1,4 +1,4 @@
-package com.tigerspike.bitbucketcodemetrics
+package com.tigerspike.bitbucketcodemetrics.api
 
 import com.tigerspike.bitbucketcodemetrics.model.Activity
 import com.tigerspike.bitbucketcodemetrics.model.FullCommit
@@ -8,8 +8,28 @@ import retrofit2.HttpException
 
 class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
 
+    class Builder {
+        private var debug = false
+        private var credentials: Credentials? = null
+
+        fun debug(debug: Boolean): Builder {
+            this.debug = debug
+            return this
+        }
+
+        fun credentials(credentials: Credentials): Builder {
+            this.credentials = credentials
+            return this
+        }
+
+        fun build() = BitbucketAPI(BitbucketAPIClient(debug = debug, credentials = credentials))
+    }
+
     companion object {
-        fun client(debug: Boolean = false) = BitbucketAPI(BitbucketAPIClient(debug = debug))
+
+        fun builder(): Builder {
+            return Builder()
+        }
     }
 
     suspend fun fetchPullRequests(
@@ -17,7 +37,7 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
         repositorySlug: String,
         prState: PullRequest.State?,
         size: Int? = null,
-        page: Int? = null
+        page: String? = null
     ): Paginated<PullRequest> {
         val result = client.apiDefinition.listRepos(
             user,
@@ -27,7 +47,7 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
             page = page
         )
 
-        result.values.filter { it.isValid() }.forEach {
+        result.values.forEach {
             it.activity = loadActivity(user, repositorySlug, it).loadAll()
             it.commits = loadCommits(user, repositorySlug, it).loadAll().sortedBy { it.date }
         }
@@ -43,8 +63,8 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
         user: String,
         repositorySlug: String,
         pullRequest: PullRequest,
-        size: Int? = 30,
-        page: Int? = null
+        size: Int? = 50,
+        page: String? = null
     ): Paginated<FullCommit> {
         return try {
             client.apiDefinition.listPullRequestCommits(
@@ -61,7 +81,7 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
         } catch (e: HttpException) {
             if (e.code() == 404) {
                 // Some PRs have no commits if another branch merged it.
-                return Paginated(10, 0, 1, null, emptyList())
+                return Paginated(10, 0, "1", null, emptyList())
             }
             throw(e)
         }
@@ -71,8 +91,8 @@ class BitbucketAPI private constructor(val client: BitbucketAPIClient) {
         user: String,
         repositorySlug: String,
         pullRequest: PullRequest,
-        size: Int? = 30,
-        page: Int? = null
+        size: Int? = 50,
+        page: String? = null
     ): Paginated<Activity> {
         return client.apiDefinition.listPullRequestActivity(
             user,

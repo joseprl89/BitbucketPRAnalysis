@@ -1,19 +1,18 @@
-package com.tigerspike.bitbucketcodemetrics
+package com.tigerspike.bitbucketcodemetrics.api
 
 import com.google.gson.*
-import com.tigerspike.bitbucketcodemetrics.retrofit.APIDefinition
-import okhttp3.OkHttpClient
+import com.tigerspike.bitbucketcodemetrics.api.retrofit.APIDefinition
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Type
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.concurrent.TimeUnit
 
 class BitbucketAPIClient(
-    val baseURL: String = "https://api.bitbucket.org/2.0/",
-    val debug: Boolean
+    baseURL: String = "https://api.bitbucket.org/2.0/",
+    val debug: Boolean,
+    credentials: Credentials?
 ) {
 
     val apiDefinition: APIDefinition
@@ -21,29 +20,39 @@ class BitbucketAPIClient(
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseURL)
-            .client(createOkHTTPClient(debug))
+            .client(createOkHTTPClient(debug, credentials))
             .addConverterFactory(GsonConverterFactory.create(gson()))
             .build()
 
         apiDefinition = retrofit.create(APIDefinition::class.java)
     }
 
-    private fun createOkHTTPClient(debug: Boolean): OkHttpClient {
+    private fun createOkHTTPClient(debug: Boolean, credentials: Credentials?): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level =
             if (debug) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
 
         return OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(object : Interceptor {
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    if (credentials == null) return chain.proceed(chain.request())
+
+                    val newRequest = chain.request().newBuilder()
+                        .header("Authorization", credentials.basic())
+                        .build()
+
+                    return chain.proceed(newRequest)
+                }
+            })
             .addInterceptor(loggingInterceptor)
             .build()
     }
 
     private fun gson(): Gson {
         return GsonBuilder()
-            .registerTypeAdapter(ZonedDateTime::class.java, object : JsonDeserializer<ZonedDateTime> {
+            .registerTypeAdapter(
+                ZonedDateTime::class.java,
+                object : JsonDeserializer<ZonedDateTime> {
                     @Throws(JsonParseException::class)
                     override fun deserialize(
                         json: JsonElement,
@@ -52,7 +61,7 @@ class BitbucketAPIClient(
                     ): ZonedDateTime {
                         return ZonedDateTime.parse(json.asJsonPrimitive.asString)
                     }
-            })
+                })
             .create()
     }
 }
