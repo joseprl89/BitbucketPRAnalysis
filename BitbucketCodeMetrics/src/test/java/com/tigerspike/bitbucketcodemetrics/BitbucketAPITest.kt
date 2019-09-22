@@ -1,8 +1,10 @@
 package com.tigerspike.bitbucketcodemetrics
 
-import com.tigerspike.bitbucketcodemetrics.model.Paginated
 import com.tigerspike.bitbucketcodemetrics.model.PullRequest
+import com.tigerspike.bitbucketcodemetrics.model.correlationBetweenComponents
 import kotlinx.coroutines.runBlocking
+import org.apache.commons.math3.linear.RealMatrix
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -18,18 +20,18 @@ class BitbucketAPITest {
     @Test
     fun testBitbucketAPI() {
         runBlocking {
-            val result = sut.fetchPullRequests(user, repositorySlug, prState, size = 50)
-            assertThat(result.values.count(), `is`(not(equalTo(0))))
+            val pullRequests = sut.fetchPullRequests(user, repositorySlug, prState, size = 50).loadAll()
+            assertThat(pullRequests.count(), `is`(not(equalTo(0))))
 
-            val pullRequests = mutableListOf<PullRequest>()
-            var nextPage: Paginated<PullRequest>? = result
-            do {
-                nextPage?.let { pullRequests.addAll(it.values) }
-                nextPage = nextPage?.loadNextPage()
-                assertThat(nextPage?.values?.count(), `is`(not(equalTo(0))))
-            } while (nextPage != null)
+            val correlationMatrix = pullRequests.correlationBetweenComponents()
 
-            assertThat(pullRequests.count(), `is`(equalTo(result.size)))
+            print(correlationMatrix)
         }
+    }
+}
+
+private fun RealMatrix.userFriendlyString(): String {
+    return data.joinToString(separator = "\n\t", prefix = "Matrix: \n\t") {
+        it.joinToString { value -> "%.2f".format(value) }
     }
 }
