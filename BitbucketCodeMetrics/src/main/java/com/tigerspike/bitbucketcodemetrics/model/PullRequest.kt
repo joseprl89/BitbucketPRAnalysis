@@ -53,7 +53,7 @@ data class PullRequest(
         val mergeTime = mergeTime()
 
         return doubleArrayOf(
-            ChronoUnit.SECONDS.between(firstCommitDate, mergeTime).toDouble(),
+            secondsBetweenFirstCommitAndMerge(),
             ChronoUnit.SECONDS.between(firstCommitDate, created_on).toDouble(),
             ChronoUnit.SECONDS.between(created_on, firstApproval).toDouble(),
             ChronoUnit.SECONDS.between(firstCommitDate, firstApproval).toDouble(),
@@ -66,6 +66,8 @@ data class PullRequest(
             mergeCommitCount()
         )
     }
+
+    fun secondsBetweenFirstCommitAndMerge() = ChronoUnit.SECONDS.between(firstCommitDate(), mergeTime()).toDouble()
 
     private fun mergeCommitCount() = commits!!.count { it.parents.count() > 1 }.toDouble()
 
@@ -101,4 +103,12 @@ fun List<PullRequest>.correlationBetweenComponents(): String {
         .joinToString(separator = "\n")
 }
 
-fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
+fun Double.format(digits: Int): String = java.lang.String.format("%.${digits}f", this)
+
+fun List<PullRequest>.asCSV(): String {
+    val header = "ID, Time between first commit and merge, activity, comments"
+    val body = filter { it.isValid() }.joinToString(separator = "\n") {
+        it.id + "," + it.secondsBetweenFirstCommitAndMerge() + "," + it.activity + "," + it.comment_count
+    }
+    return header + "\n" + body
+}
