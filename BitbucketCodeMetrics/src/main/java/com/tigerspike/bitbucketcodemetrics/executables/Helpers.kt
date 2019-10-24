@@ -6,7 +6,9 @@ import com.tigerspike.bitbucketcodemetrics.model.PullRequest
 import java.lang.NumberFormatException
 import java.util.*
 
-suspend fun fetchPullRequests(api: BitbucketAPI): List<PullRequest> {
+data class FetchPullRequestResult(val slug: String, val pullRequests: List<PullRequest>)
+
+suspend fun fetchPullRequests(api: BitbucketAPI): FetchPullRequestResult {
     val repositoryUsername =
         readString("Enter the username that hosts the repo (e.g. atlassian): ")
     val repositorySlug =
@@ -18,8 +20,8 @@ suspend fun fetchPullRequests(api: BitbucketAPI): List<PullRequest> {
             readString("Please, specify which target branch we should filter for.")
     }
 
-    var limit = 5
-    if (readBoolean("Do you want to limit how many pages of PRs to load?")) {
+    var limit = 1
+    if (readBoolean("Do you want to limit how many pages of PRs to load (1 page of 50 PRs by default)?")) {
         limit =
             readInt("Please, specify how many pages to load. Each page contains 50 PRs.")
     }
@@ -37,13 +39,15 @@ suspend fun fetchPullRequests(api: BitbucketAPI): List<PullRequest> {
     }
 
     return optRetry {
-        api.fetchPullRequests(
-            repositoryUsername,
-            repositorySlug,
-            PullRequest.State.MERGED,
-            filterTargetBranch = filterTargetBranch,
-            size = 50
-        ).loadAll(limit = limit)
+        FetchPullRequestResult(
+            repositorySlug, api.fetchPullRequests(
+                repositoryUsername,
+                repositorySlug,
+                PullRequest.State.MERGED,
+                filterTargetBranch = filterTargetBranch,
+                size = 50
+            ).loadAll(limit = limit)
+        )
     }
 }
 

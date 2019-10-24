@@ -62,10 +62,12 @@ data class PullRequest(
             task_count.toDouble(),
             commits!!.size.toDouble(),
             if (task_count != 0) 1.0 else 0.0,
-            activity!!.count().toDouble(),
+            activityCount(),
             mergeCommitCount()
         )
     }
+
+    fun activityCount() = activity!!.count().toDouble()
 
     fun secondsBetweenFirstCommitAndMerge() = ChronoUnit.SECONDS.between(firstCommitDate(), mergeTime()).toDouble()
 
@@ -108,7 +110,7 @@ fun Double.format(digits: Int): String = java.lang.String.format("%.${digits}f",
 fun List<PullRequest>.asCSV(): String {
     val header = "ID, Time between first commit and merge, activity, comments"
     val body = filter { it.isValid() }.joinToString(separator = "\n") {
-        it.id + "," + it.secondsBetweenFirstCommitAndMerge() + "," + it.activity + "," + it.comment_count
+        it.id + "," + it.secondsBetweenFirstCommitAndMerge() + "," + it.activityCount() + "," + it.comment_count
     }
     return header + "\n" + body
 }

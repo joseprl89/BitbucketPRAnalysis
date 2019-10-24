@@ -8,8 +8,8 @@ fun main() {
 
     runBlocking {
         do {
-            val prs = fetchPullRequests(api)
-            val correlationMatrix = prs.correlationBetweenComponents()
+            val result = fetchPullRequests(api)
+            val correlationMatrix = result.pullRequests.correlationBetweenComponents()
             println(correlationMatrix)
         } while (readBoolean("Want to check another repository?"))
     }
