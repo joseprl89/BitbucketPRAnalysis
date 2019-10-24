@@ -1,4 +1,4 @@
-# Bitbucket PR Analysis
+# BitBucket PR Analysis
 
 Generate an analysis of the pull requests (PRs) in a Bitbucket repo using a Pearson correlation coefficient to help identify what bottlenecks a team is facing.
 
@@ -12,7 +12,12 @@ Software requirements:
 
 ## Running an analysis on your Bitbucket repo
 
-Use the `Main.kt` script to access a Command-Line Interface that requests all data needed in order to analyse a repository.
+You can analyse a repo by running the Command-Line Interface scripts available. They will request credentials and the repository address and then run the analysis.
+
+Current available analysis are:
+
+* AnalyzeCorrelations.kt: Analyses the correlation between metrics. Useful to see patterns that are hard to visualise, as an example, might be the number of comments impacts your cycle time, so you should target reducing the **need** for those comments.
+* ExportToCSV.kt: Exports a CSV so as to allow you to analyse as a spreadsheet.
 
 ### Analysing a private repo
 
