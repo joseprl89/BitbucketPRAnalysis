@@ -19,6 +19,20 @@ Current available analysis are:
 * AnalyzeCorrelations.kt: Analyses the correlation between metrics. Useful to see patterns that are hard to visualise, as an example, might be the number of comments impacts your cycle time, so you should target reducing the **need** for those comments.
 * ExportToCSV.kt: Exports a CSV so as to allow you to analyse as a spreadsheet.
 
+### Configuring run via properties file
+
+To avoid having to manually enter all the information on each run, the scripts support using a Java Properties file to specify the credentials and repositories to load.
+
+To do so, create a config.properties file in the working directory (the root of the project when running from Android Studio), with contents similar to:
+
+```
+bitbucket.username=USERNAME
+bitbucket.password=A BITBUCKET APP PASSWORD
+bitbucket.repositories=repositoryUsername/repositorySlug
+bitbucket.pages.to.load=2
+bitbucket.filter.target.branch=develop
+```
+
 ### Analysing a private repo
 
 Private repos require an app password with `Read Pull Requests` authorization in order to access them.
