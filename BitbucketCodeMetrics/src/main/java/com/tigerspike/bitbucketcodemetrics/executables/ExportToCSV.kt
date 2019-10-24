@@ -5,16 +5,15 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 
 fun main() {
-    val api = promptUserAPICredentials()
-
     runBlocking {
-        do {
-            val result = fetchPullRequests(api)
-            val csv = result.pullRequests.asCSV()
+        val api = promptUserAPICredentials()
 
-            val fileToWrite = File(result.slug + ".csv")
+        forEachPullRequest(api) {
+            val csv = it.pullRequests.asCSV()
+
+            val fileToWrite = File("output/" + it.slug + ".csv")
             fileToWrite.writeText(csv)
             println("CSV written to " + fileToWrite.absolutePath)
-        } while (readBoolean("Want to check another repository?"))
+        }
     }
 }

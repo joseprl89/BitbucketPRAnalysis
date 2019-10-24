@@ -339,3 +339,9 @@ Thumbs.db
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.gitignore.io/api/java,kotlin,android,intellij,androidstudio,macos
+
+# Ignore properties file which may include passwords
+config.properties
+
+# Ignore generated CSV files
+output

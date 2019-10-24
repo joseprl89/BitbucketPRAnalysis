@@ -1,19 +1,18 @@
 package com.tigerspike.bitbucketcodemetrics.executables
 
+import com.tigerspike.bitbucketcodemetrics.api.BitbucketAPI
 import com.tigerspike.bitbucketcodemetrics.model.correlationBetweenComponents
 import kotlinx.coroutines.runBlocking
 
 fun main() {
-    val api = promptUserAPICredentials()
-
     runBlocking {
-        do {
-            val result = fetchPullRequests(api)
-            val correlationMatrix = result.pullRequests.correlationBetweenComponents()
+        val api = promptUserAPICredentials()
+
+        forEachPullRequest(api) {
+            val correlationMatrix = it.pullRequests.correlationBetweenComponents()
             println(correlationMatrix)
-        } while (readBoolean("Want to check another repository?"))
+        }
     }
 }
-
 
 
