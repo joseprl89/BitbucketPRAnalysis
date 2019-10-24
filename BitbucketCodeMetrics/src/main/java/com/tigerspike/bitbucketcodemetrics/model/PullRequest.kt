@@ -48,16 +48,12 @@ data class PullRequest(
     }
 
     fun components(): DoubleArray {
-        val firstApproval = firstApproval()
-        val firstCommitDate = firstCommitDate()
-        val mergeTime = mergeTime()
-
         return doubleArrayOf(
             secondsBetweenFirstCommitAndMerge(),
-            ChronoUnit.SECONDS.between(firstCommitDate, created_on).toDouble(),
-            ChronoUnit.SECONDS.between(created_on, firstApproval).toDouble(),
-            ChronoUnit.SECONDS.between(firstCommitDate, firstApproval).toDouble(),
-            ChronoUnit.SECONDS.between(firstApproval, mergeTime).toDouble(),
+            secondsBetweenFirstCommitAndPRCreation(),
+            secondsBetweenPRCreationAndApproval(),
+            secondsBetweenFirstCommitAndApproval(),
+            secondsBetweenApprovalAndMerge(),
             comment_count.toDouble(),
             task_count.toDouble(),
             commits!!.size.toDouble(),
@@ -67,9 +63,22 @@ data class PullRequest(
         )
     }
 
+    fun secondsBetweenApprovalAndMerge() =
+        ChronoUnit.SECONDS.between(firstApproval(), mergeTime()).toDouble()
+
+    fun secondsBetweenFirstCommitAndApproval() =
+        ChronoUnit.SECONDS.between(firstCommitDate(), firstApproval()).toDouble()
+
+    fun secondsBetweenPRCreationAndApproval() =
+        ChronoUnit.SECONDS.between(created_on, firstApproval()).toDouble()
+
+    fun secondsBetweenFirstCommitAndPRCreation() =
+        ChronoUnit.SECONDS.between(firstCommitDate(), created_on).toDouble()
+
     fun activityCount() = activity!!.count().toDouble()
 
-    fun secondsBetweenFirstCommitAndMerge() = ChronoUnit.SECONDS.between(firstCommitDate(), mergeTime()).toDouble()
+    fun secondsBetweenFirstCommitAndMerge() =
+        ChronoUnit.SECONDS.between(firstCommitDate(), mergeTime()).toDouble()
 
     private fun mergeCommitCount() = commits!!.count { it.parents.count() > 1 }.toDouble()
 
@@ -79,7 +88,10 @@ data class PullRequest(
         try {
             return activity!!.first { it.update?.state == State.MERGED }.update!!.date
         } catch (e: Exception) {
-            throw Exception("Failed to retrieve merge time for PR ${this.id} with activity: ${this.activity}", e)
+            throw Exception(
+                "Failed to retrieve merge time for PR ${this.id} with activity: ${this.activity}",
+                e
+            )
         }
     }
 
@@ -108,9 +120,22 @@ fun List<PullRequest>.correlationBetweenComponents(): String {
 fun Double.format(digits: Int): String = java.lang.String.format("%.${digits}f", this)
 
 fun List<PullRequest>.asCSV(): String {
-    val header = "ID, Time between first commit and merge, activity, comments"
+    val header = "ID, " +
+            "Days between first commit and PR creation, " +
+            "Days between PR creation and approval, " +
+            "Days between approval and merge activity, " +
+            "comments"
+
     val body = filter { it.isValid() }.joinToString(separator = "\n") {
-        it.id + "," + it.secondsBetweenFirstCommitAndMerge() + "," + it.activityCount() + "," + it.comment_count
+        it.id + "," +
+                it.secondsBetweenFirstCommitAndMerge().toDays() + "," +
+                it.secondsBetweenPRCreationAndApproval().toDays() + "," +
+                it.secondsBetweenApprovalAndMerge().toDays() + "," +
+                it.comment_count
     }
     return header + "\n" + body
+}
+
+private fun Double.toDays(): Double {
+    return this / (60 * 60 * 24)
 }
