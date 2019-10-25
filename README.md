@@ -41,7 +41,7 @@ To do so, create a config.properties file in the working directory, with content
 ```
 bitbucket.username=USERNAME
 bitbucket.password=A BITBUCKET APP PASSWORD
-bitbucket.repositories=repositoryUsername/repositorySlug
+bitbucket.repositories=repositoryUsername/repositorySlug,repositoryUsername2/repositorySlug2,...
 bitbucket.pages.to.load=2
 bitbucket.filter.target.branch=develop
 ```
