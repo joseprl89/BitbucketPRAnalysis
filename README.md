@@ -1,6 +1,12 @@
 # BitBucket PR Analysis
 
-Generate an analysis of the pull requests (PRs) in a Bitbucket repo using a Pearson correlation coefficient to help identify what bottlenecks a team is facing.
+Provides utilities to study the pull requests (PRs) merged in a Bitbucket repo.
+
+Currently it supports using a Pearson correlation coefficient to help identify what bottlenecks a team is facing, and exporting some relevant PR data as a CSV.
+
+![sample csv export results](img/sample-csv-export-results.png)
+
+This data can be leveraged by engineering teams to identify bottlenecks on their flows, measure the progress since an experiment was executed,...
 
 ## Getting Started
 
