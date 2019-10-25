@@ -131,9 +131,8 @@ suspend fun promptUserAPICredentials(): BitbucketAPI {
 }
 
 suspend fun withProperties(function: suspend (Properties) -> Boolean): Boolean {
+    val file = File("config.properties")
     try {
-        val file = File("config.properties")
-        println(file.absolutePath)
         FileInputStream(file).use { input ->
 
             val prop = Properties()
@@ -144,7 +143,7 @@ suspend fun withProperties(function: suspend (Properties) -> Boolean): Boolean {
             return function(prop)
         }
     } catch (ex: IOException) {
-        ex.printStackTrace()
+        println("Unable to read config file located at: ${file.absolutePath}")
         return false
     }
 }

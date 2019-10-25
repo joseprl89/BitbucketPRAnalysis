@@ -10,7 +10,7 @@ Software requirements:
 
 * Android Studio or IntellijIDEA
 
-## Running an analysis on your Bitbucket repo
+## Running an analysis on your BitBucket repo
 
 You can analyse a repo by running the Command-Line Interface scripts available. They will request credentials and the repository address and then run the analysis.
 
@@ -19,11 +19,18 @@ Current available analysis are:
 * AnalyzeCorrelations.kt: Analyses the correlation between metrics. Useful to see patterns that are hard to visualise, as an example, might be the number of comments impacts your cycle time, so you should target reducing the **need** for those comments.
 * ExportToCSV.kt: Exports a CSV so as to allow you to analyse as a spreadsheet.
 
+You can also execute them by using the gradle tasks included:
+
+```bash
+./gradlew --console=plain runCSVExport
+./gradlew --console=plain runCorrelations
+```
+
 ### Configuring run via properties file
 
 To avoid having to manually enter all the information on each run, the scripts support using a Java Properties file to specify the credentials and repositories to load.
 
-To do so, create a config.properties file in the working directory (the root of the project when running from Android Studio), with contents similar to:
+To do so, create a config.properties file in the working directory, with contents similar to:
 
 ```
 bitbucket.username=USERNAME
@@ -32,6 +39,8 @@ bitbucket.repositories=repositoryUsername/repositorySlug
 bitbucket.pages.to.load=2
 bitbucket.filter.target.branch=develop
 ```
+
+This file should be located at the root of the repository when running from Android Studio, or at the `BitbucketCodeMetrics` module when running from the command line using Gradle.
 
 ### Analysing a private repo
 
@@ -45,7 +54,7 @@ The `Main.kt` script will prompt at the beginning to provide your username and a
 
 Right click on the BitbucketPullRequestAnalysisTest and select run tests to execute a test on a public repo.
 
-## How are the Pull Requests analysed?
+## How are metric correlations measured?
 
 This software will perform two tasks to analyse your PRs.
 
