@@ -111,6 +111,14 @@ PPMCC doesn't allow to easily compare discrete data (E.g. does the programming l
 
 Therefore, we can't really measure things like "Would using language A, B or C correlate with the time to merge?"
 
+## Built With
+
+- [NodeJS](https://nodejs.org/)
+- [Mocha](https://mochajs.org/index.html) - Test harness
+- [compute-pcorr](https://www.npmjs.com/package/compute-pcorr) - Pearson correlation implementation
+- [Excel4node](https://www.npmjs.com/package/excel4node) - Excel exporter
+- [Node-fetch](https://www.npmjs.com/package/node-fetch) - REST API Client
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning.
