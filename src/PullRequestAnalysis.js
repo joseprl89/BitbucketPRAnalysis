@@ -67,8 +67,8 @@ module.exports = class PullRequestAnalysis {
             'Time to merge code': daysBetween(firstCommitDate, mergeDate),
 
             'Time between first commit and creation of the PR': daysBetween(firstCommitDate, prCreationDate),
-            'Time between creation of the PR and approval': daysBetween(prCreationDate, approvalDate),
-            'Time between approval and merge': daysBetween(approvalDate, mergeDate),
+            'Time between creation of the PR and approval': approvalDate == null ? 0 : daysBetween(prCreationDate, approvalDate),
+            'Time between approval and merge': approvalDate == null ? 0 : daysBetween(approvalDate, mergeDate),
 
             'Comment count': pr.comment_count,
             'Task count': pr.task_count,
