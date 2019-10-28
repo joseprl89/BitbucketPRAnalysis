@@ -24,6 +24,9 @@ Before executing the scripts, you'll have to setup your configuration file, whic
 * What credentials to use to fetch data
 * Which repositories to read
 * How many pages of PRs to load
+* Whether to filter the PRs to ensure we don't measure git flow special branches such as:
+  * Merge to master
+  * Release or hotfix branches being merged to develop or master
 
 To do so, you'll need to define a config.json file at the root of the project with the following format:
 
@@ -38,7 +41,8 @@ To do so, you'll need to define a config.json file at the root of the project wi
         "myUser/myOtherRepository",
         "myOtherUser/yetAnotherRepository"
     ],
-    "pagesToLoad": 1
+    "pagesToLoad": 2,
+    "filterByGitFlow": true
 }
 ```
 
@@ -57,7 +61,7 @@ Exports an xlsx file to enable to further analyse the data and visualise it in c
 You can run the export using:
 
 ```bash
-npm run --silent export-to-sheet 
+npm run --silent export-to-sheet
 ```
 
 ### Correlations between measures
@@ -76,7 +80,7 @@ As a hypothetical example, the number of comments might correlate with your cycl
 
 #### Interpreting the result
 
-After analysing the last pull requests of your repo, the system will output a set of correlations between the time between first commit, to merging your PR. 
+After analysing the last pull requests of your repo, the system will output a set of correlations between the time between first commit, to merging your PR.
 
 The values can range from -1.0 to 1.0, where:
 
@@ -86,7 +90,7 @@ The values can range from -1.0 to 1.0, where:
 
 As an example, these are results from a private repository:
 
-```
+```text
 Correlation between time to merge and Time between first commit and creation of the PR: 0.7894789362173071
 Correlation between time to merge and Commit count: 0.5624755997810248
 Correlation between time to merge and Time between approval and merge: 0.5611995438606215
@@ -113,11 +117,11 @@ Therefore, we can't really measure things like "Would using language A, B or C c
 
 ## Built With
 
-- [NodeJS](https://nodejs.org/)
-- [Mocha](https://mochajs.org/index.html) - Test harness
-- [compute-pcorr](https://www.npmjs.com/package/compute-pcorr) - Pearson correlation implementation
-- [Excel4node](https://www.npmjs.com/package/excel4node) - Excel exporter
-- [Node-fetch](https://www.npmjs.com/package/node-fetch) - REST API Client
+* [NodeJS](https://nodejs.org/)
+* [Mocha](https://mochajs.org/index.html) - Test harness
+* [compute-pcorr](https://www.npmjs.com/package/compute-pcorr) - Pearson correlation implementation
+* [Excel4node](https://www.npmjs.com/package/excel4node) - Excel exporter
+* [Node-fetch](https://www.npmjs.com/package/node-fetch) - REST API Client
 
 ## Versioning
 

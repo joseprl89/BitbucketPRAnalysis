@@ -22,6 +22,7 @@ async function main() {
     console.log()
     allRepositories.forEach(repoData => {
         let analysis = new PullRequestAnalysis(repoData.pullRequests)
+        if (config.filterByGitFlow) analysis.filterByGitFlow()
         
         console.log(`Analysis for ${repoData.repository}`)
         console.log()

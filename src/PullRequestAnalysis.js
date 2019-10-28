@@ -15,6 +15,12 @@ module.exports = class PullRequestAnalysis {
         return this.data.map(this.prToMeasure)
     }
 
+    filterByGitFlow() {
+        this.data = this.data.filter(pr => {
+            return !(pr.source.branch.name.startsWith('release/') || pr.source.branch.name.startsWith('hotfix/'))
+        })
+    }
+
     pearsonCorrelation() {
         if (this.data.length == 0) return null
 
