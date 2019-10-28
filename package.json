@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joseprl89/BitbucketPRAnalysis.git"
+    "url": "git@github.com:joseprl89/BitbucketPRAnalysis.git"
   },
   "keywords": [
     "bitbucket",
