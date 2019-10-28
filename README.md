@@ -117,5 +117,5 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## Relevant Links
 
-* [Pearson product-moment correlation coefficient (PPMCC)](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) and compute-pcorr](https://www.npmjs.com/package/compute-pcorr); The node module used as an implementation.
+* [Pearson product-moment correlation coefficient (PPMCC)](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) and [compute-pcorr](https://www.npmjs.com/package/compute-pcorr), The node module used as an implementation.
 * [Creating a BitBucket App password](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html)
