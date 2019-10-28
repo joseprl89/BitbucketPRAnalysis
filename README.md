@@ -17,7 +17,7 @@ Software requirements:
 * [NodeJS](https://nodejs.org/)
 * A [BitBucket App password](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html) with "Read pull request" permission.
 
-### Creating your configuration file
+### Creating your configuration file
 
 Before executing the scripts, you'll have to setup your configuration file, which defines:
 
