@@ -4,7 +4,9 @@
   "description": "Analyse the behaviour of your team through the metadata of pull requests in Bitbucket to help identify what bottlenecks a team is facing.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "export-to-sheet": "node src/export-to-sheet.js",
+    "correlations": "node src/correlations.js"
   },
   "repository": {
     "type": "git",

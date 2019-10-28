@@ -1,8 +1,15 @@
-const BitbucketAPI = require('./src/BitbucketAPI')
-const PullRequestAnalysis = require('./src/PullRequestAnalysis.js')
+const BitbucketAPI = require('./BitbucketAPI')
+const PullRequestAnalysis = require('./PullRequestAnalysis.js')
 const xl = require('excel4node');
 
-const config = require('./config.json')
+var config = null
+try {
+    config = require('../config.json')
+} catch (error) {
+    console.error("Config file not found. Please ensure you create one as detailed in the readme file.")
+    return
+}
+
 const api = new BitbucketAPI(config.authorization)
 
 async function main() {
