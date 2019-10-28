@@ -1,0 +1,33 @@
+{
+  "name": "y",
+  "version": "0.1.0",
+  "description": "Analyse the behaviour of your team through the metadata of pull requests in Bitbucket to help identify what bottlenecks a team is facing.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joseprl89/BitbucketPRAnalysis.git"
+  },
+  "keywords": [
+    "bitbucket",
+    "pull",
+    "request",
+    "analysis"
+  ],
+  "author": "Josep Rodriguez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joseprl89/BitbucketPRAnalysis/issues"
+  },
+  "homepage": "https://github.com/joseprl89/BitbucketPRAnalysis#readme",
+  "dependencies": {
+    "compute-pcorr": "^1.0.0",
+    "excel4node": "^1.7.2",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5"
+  }
+}

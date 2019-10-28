@@ -1,2 +1,0 @@
-include ':BitbucketCodeMetrics'
-rootProject.name='CodeMetrics'
