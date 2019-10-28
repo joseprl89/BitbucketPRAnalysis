@@ -1,8 +1,8 @@
 # BitBucket PR Analysis
 
-Provides utilities to study the pull requests (PRs) merged in a Bitbucket repo.
+Provides utilities to study pull requests (PRs) merged in a Bitbucket repo.
 
-Currently it supports using a Pearson correlation coefficient to help identify what bottlenecks a team is facing, and exporting some relevant PR data as a CSV.
+Currently it supports using a Pearson correlation coefficient to help identify what bottlenecks a team is facing, and exporting some relevant PR measures as a CSV.
 
 ![sample csv export results](img/sample-csv-export-results.png)
 
@@ -14,99 +14,108 @@ This data can be leveraged by engineering teams to identify bottlenecks on their
 
 Software requirements:
 
-* Android Studio or IntellijIDEA
+* [NodeJS](https://nodejs.org/)
+* A [BitBucket App password](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html) with "Read pull request" permission.
 
-## Running an analysis on your BitBucket repo
+### Creating your configuration file
 
-You can analyse a repo by running the Command-Line Interface scripts available. They will request credentials and the repository address and then run the analysis.
+Before executing the scripts, you'll have to setup your configuration file, which defines:
 
-Current available analysis are:
+* What credentials to use to fetch data
+* Which repositories to read
+* How many pages of PRs to load
 
-* AnalyzeCorrelations.kt: Analyses the correlation between metrics. Useful to see patterns that are hard to visualise, as an example, might be the number of comments impacts your cycle time, so you should target reducing the **need** for those comments.
-* ExportToCSV.kt: Exports a CSV so as to allow you to analyse as a spreadsheet.
+To do so, you'll need to define a config.json file at the root of the project with the following format:
 
-You can also execute them by using the gradle tasks included:
-
-```bash
-./gradlew --console=plain runCSVExport
-./gradlew --console=plain runCorrelations
+```javascript
+{
+    "authorization": {
+        "username": "joseprl89",
+        "password": "my bitbucket app password"
+    },
+    "repositories": [
+        "myUser/myRepository",
+        "myUser/myOtherRepository",
+        "myOtherUser/yetAnotherRepository"
+    ],
+    "pagesToLoad": 1
+}
 ```
-
-### Configuring run via properties file
-
-To avoid having to manually enter all the information on each run, the scripts support using a Java Properties file to specify the credentials and repositories to load.
-
-To do so, create a config.properties file in the working directory, with contents similar to:
-
-```
-bitbucket.username=USERNAME
-bitbucket.password=A BITBUCKET APP PASSWORD
-bitbucket.repositories=repositoryUsername/repositorySlug,repositoryUsername2/repositorySlug2,...
-bitbucket.pages.to.load=2
-bitbucket.filter.target.branch=develop
-```
-
-This file should be located at the root of the repository when running from Android Studio, or at the `BitbucketCodeMetrics` module when running from the command line using Gradle.
-
-### Analysing a private repo
-
-Private repos require an app password with `Read Pull Requests` authorization in order to access them.
-
-These credentials can be generated in the User settings section in the BitBucket page following this [guide](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html).
-
-The `Main.kt` script will prompt at the beginning to provide your username and app passwords.
 
 ## Running the tests
 
-Right click on the BitbucketPullRequestAnalysisTest and select run tests to execute a test on a public repo.
+Tests can be run using `npm test`.
 
-## How are metric correlations measured?
+## Analysing your BitBucket repo
 
-This software will perform two tasks to analyse your PRs.
+You can analyse a repo by running the NPM scripts available. Each analysis has its own section below.
 
-* Downloading PR metadata using the Bitbucket v2.0 API
-* Execute a Pearson product-moment correlation coefficient (PPMCC) using the [Apache commons framework](https://commons.apache.org/proper/commons-math/javadocs/api-3.3/org/apache/commons/math3/stat/correlation/PearsonsCorrelation.html)
+### Exporting measures to excel
 
-A PPMCC is an analysis over a matrix of data of size NxM (M measures of N variables) that yields a square matrix of NxN. In the resulting matrix, each cell with index i, j defines how strongly the variables with index i and j are correlated.
+Exports an xlsx file to enable to further analyse the data and visualise it in charts.
 
-### How to understand the results
+You can run the export using:
 
-As detailed above, the result of the PPMCC is a square matrix detailing how strongly the two variables correlate to each other.
+```bash
+npm run --silent export-to-sheet 
+```
 
-After the last ~250 PRs have been analysed, the system will output a set of one line per variable analysed detailing how they correlated to the interval between the first commit and merging the PR.
+### Correlations between measures
+
+Analyses the correlation between metrics using the [Pearson product-moment correlation coefficient (PPMCC)](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) through the [compute-pcorr](https://www.npmjs.com/package/compute-pcorr) node module.
+
+This analysis is useful to identify which metric will have the highest impact on your overall performance once improved and to discover patterns that are hard to visualise.
+
+You can run the analysis using:
+
+```bash
+npm run --silent correlations
+```
+
+As a hypothetical example, the number of comments might correlate with your cycle time, so you should target reducing the **need** for those comments.
+
+#### Interpreting the result
+
+After analysing the last pull requests of your repo, the system will output a set of correlations between the time between first commit, to merging your PR. 
 
 The values can range from -1.0 to 1.0, where:
 
-* 0 means the variable does not impact one way or another the time it takes to merge a PR.
-* 1 means the variable impacts positively how long it takes to merge a PR (takes more time).
-* -1 means the variable impacts negatively how long it takes to merge a PR (takes less time).
+* 0 means the variable does not impact one way or another the time it takes to merge a PR, and therefore there's no need to optimise it.
+* 1 means direct correlation. When the measure increases, so will the time between first commit and merge, thus you'll want to reduce this metric to reduce the time it takes to merge your code.
+* -1 means inverse correlation. When the measure increases, it will cause a decrease of the time between first commit and merge, thus you'll want to reduce this metric to reduce the time it takes to merge your code.
 
-Therefore, if a variable is close to 1, the team should take actions to reduce that variable, as it will result in an increase in the overall throughput of it. If, on the other hand, the value is close to -1, you want to maximise that variable.
-
-As an example, these are the results of a real repository I run the analysis on:
+As an example, these are results from a private repository:
 
 ```
-Time between first commit and approval:		0.98
-Time between first commit and PR creation:		0.97
-Time between approval and merge:		0.33
-Merge commit count:		0.31
-Number of commits:		0.20
-Activity in PR:		0.15
-Time between creation and approval:		0.09
-Number of comments:		0.06
-Number of tasks:		NaN
-Using tasks:		NaN
+Correlation between time to merge and Time between first commit and creation of the PR: 0.7894789362173071
+Correlation between time to merge and Commit count: 0.5624755997810248
+Correlation between time to merge and Time between approval and merge: 0.5611995438606215
+Correlation between time to merge and Time between creation of the PR and approval: 0.5609924985817157
+Correlation between time to merge and Merge commit count: 0.5534876138808782
+Correlation between time to merge and Comment count: 0.4261628055496479
+Correlation between time to merge and Activity count: 0.42079914430331505
+Correlation between time to merge and Tasks used: NaN
+Correlation between time to merge and Task count: NaN
 ```
 
-Based on these numbers we can see that:
+Based on these numbers, we should prioritise improvements on the following order:
 
-* Altough obvious, the most significant correlation to the time from first commit to merge is the time from first commit to the PR creation and approval.
-* The time between approval and merge has a significant correlation.
-* The number of merge commits in the PR have a significant impact in the performance of the team
-* A higher activity in the PR weakly correlates in a positive manner to the time to merge.
+* The time between first commit and creation of the PR.
+* Number of commits in the PR.
+* Time between approval and merge.
+* Merge commit count
 
-With these results, the team of the example could benefit from considering how to reduce the time between the first commit and creating and approving a PR, how to reduce the number of merge commits to perform and the activity in the PR. An example of such activities could be to reduce the batch size, or to catchup before the start of a feature to minimise the impact of integrating branches.
-
-## Caveats
+#### Caveats
 
 PPMCC doesn't allow to easily compare discrete data (E.g. does the programming language impact the type?).
+
+Therefore, we can't really measure things like "Would using language A, B or C correlate with the time to merge?"
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning.
+
+## Relevant Links
+
+* [Pearson product-moment correlation coefficient (PPMCC)](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) and compute-pcorr](https://www.npmjs.com/package/compute-pcorr); The node module used as an implementation.
+* [Creating a BitBucket App password](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html)
