@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "export-to-sheet": "node src/export-to-sheet.js",
-    "correlations": "node src/correlations.js"
+    "correlations": "node src/correlations.js",
+    "create-config": "node src/create-config.js"
   },
   "repository": {
     "type": "git",

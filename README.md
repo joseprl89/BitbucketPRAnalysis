@@ -46,6 +46,12 @@ To do so, you'll need to define a config.json file at the root of the project wi
 }
 ```
 
+You can use the utility script to guide you through the creation of this file by executing:
+
+```bash
+npm run create-config --silent
+```
+
 ## Running the tests
 
 Tests can be run using `npm test`.
