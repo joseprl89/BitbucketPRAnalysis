@@ -42,6 +42,7 @@ module.exports = class PullRequestAnalysis {
             .map(item => {
                 return `Correlation between time to merge and ${keys[item.index]}: ${item.value}`
             })
+            .slice(1)
             .join('\n')
     }
 
@@ -55,20 +56,20 @@ module.exports = class PullRequestAnalysis {
         let firstCommitDate = new Date(pr.commits.slice(-1)[0].date)
 
         return {
-            id: pr.id,
+            'Id': pr.id,
 
-            timeToMergeCode: daysBetween(firstCommitDate, mergeDate),
+            'Time to merge code': daysBetween(firstCommitDate, mergeDate),
 
-            timeBetweenFirstCommitAndCreation: daysBetween(firstCommitDate, prCreationDate),
-            timeBetweenCreationAndApproval: daysBetween(prCreationDate, approvalDate),
-            timeBetweenApprovalAndMerge: daysBetween(approvalDate, mergeDate),
+            'Time between first commit and creation of the PR': daysBetween(firstCommitDate, prCreationDate),
+            'Time between creation of the PR and approval': daysBetween(prCreationDate, approvalDate),
+            'Time between approval and merge': daysBetween(approvalDate, mergeDate),
 
-            commentCount: pr.comment_count,
-            taskCount: pr.task_count,
-            commitCount: pr.commits.length,
-            tasksUsed: pr.task_count > 0 ? 1 : 0,
-            activityCount: pr.activity.length,
-            mergeCommitCount: pr.commits.slice(1).filter(commit => commit.parents.length > 1).length
+            'Comment count': pr.comment_count,
+            'Task count': pr.task_count,
+            'Commit count': pr.commits.length,
+            'Tasks used': pr.task_count > 0 ? 1 : 0,
+            'Activity count': pr.activity.length,
+            'Merge commit count': pr.commits.slice(1).filter(commit => commit.parents.length > 1).length
         }
     }
 }
