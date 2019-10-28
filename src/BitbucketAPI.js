@@ -19,7 +19,7 @@ module.exports = class BitbuketAPI {
   async loadRepository(repo, pagesToLoad) {
     let pullRequests = await this.loadMergedPullRequests(repo, pagesToLoad)
     await Promise.all(pullRequests.map(async pr => await this.loadPullRequestMetadata(repo, pr)))
-    return pullRequests
+    return pullRequests.sort((a, b) => { return parseInt(b.id) - parseInt(a.id)})
   }
 
   async loadPullRequestMetadata(repo, pullRequest) {
