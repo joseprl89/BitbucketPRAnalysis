@@ -1,5 +1,5 @@
 {
-  "name": "BitbucketPRAnalysis",
+  "name": "bitbucket-pr-analysis",
   "version": "0.1.0",
   "description": "Analyse the behaviour of your team through the metadata of pull requests in Bitbucket to help identify what bottlenecks a team is facing.",
   "main": "index.js",
