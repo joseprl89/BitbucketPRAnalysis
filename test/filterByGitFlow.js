@@ -9,6 +9,11 @@ describe('PullRequestAnalysis', () => {
                     name: "feature/123"
                 }
             },
+            destination: {
+                branch: {
+                    name: "feature/123"
+                }
+            },
             commits: [{}],
             activity: [{update: {state: "MERGED"}}]
         }
@@ -45,6 +50,15 @@ describe('PullRequestAnalysis', () => {
         it('Removes PRs from hotfix/*', () => {
             var pr = samplePullRequest()
             pr.source.branch.name = "hotfix/1.2.3"
+            analysis = new PullRequestAnalysis([pr])
+            analysis.filterByGitFlow()
+    
+            assert.equal(analysis.measures.length, 0)
+        })
+
+        it('Removes merges to master', () => {
+            var pr = samplePullRequest()
+            pr.destination.branch.name = "master"
             analysis = new PullRequestAnalysis([pr])
             analysis.filterByGitFlow()
     

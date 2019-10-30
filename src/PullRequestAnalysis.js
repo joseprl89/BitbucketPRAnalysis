@@ -17,7 +17,11 @@ module.exports = class PullRequestAnalysis {
 
     filterByGitFlow() {
         this.data = this.data.filter(pr => {
-            return !(pr.source.branch.name.startsWith('release/') || pr.source.branch.name.startsWith('hotfix/'))
+            return !(
+                pr.source.branch.name.startsWith('release/') || 
+                pr.source.branch.name.startsWith('hotfix/') ||
+                pr.destination.branch.name == "master"
+            ) 
         })
     }
 

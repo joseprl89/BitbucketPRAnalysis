@@ -22,8 +22,8 @@ Correlation between time to merge and Activity count: 0.21370242680885976
 Correlation between time to merge and Time between first commit and creation of the PR: 0.17888047419396244
 Correlation between time to merge and Merge commit count: 0.175549165584237
 Correlation between time to merge and Comment count: 0.0983769845406757
-Correlation between time to merge and Tasks used: NaN
-Correlation between time to merge and Task count: NaN`
+Correlation between time to merge and Task count: NaN
+Correlation between time to merge and Tasks used: NaN`
 
             assert.equal(analysis.pearsonCorrelation(), expected)
         })
