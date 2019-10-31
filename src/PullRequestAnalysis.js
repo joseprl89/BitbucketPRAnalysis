@@ -74,7 +74,13 @@ module.exports = class PullRequestAnalysis {
             'Activity count': pr.activity.length,
             'Merge commit count': pr.commits.slice(1).filter(commit => commit.parents.length > 1).length
         }
+        pr.mergeDate = mergeDate
+        pr.creationDate = prCreationDate
+        pr.approvalDate = approvalDate
+        pr.firstCommitDate = firstCommitDate
+        
         pr.measure = measure
+
         return measure
     }
 }
