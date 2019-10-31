@@ -10,7 +10,7 @@ try {
     return
 }
 
-const api = new BitbucketAPI(config.authorization)
+const api = new BitbucketAPI(config.authorization, config.filterByGitFlow, 10)
 
 async function main() {
     const allRepositories = await Promise.all(config.repositories.map(async repo => {

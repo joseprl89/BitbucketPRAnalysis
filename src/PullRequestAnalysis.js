@@ -1,5 +1,5 @@
-var pcorr = require( 'compute-pcorr' );
-var isFeaturePullRequest = require("./isFeaturePullRequest")
+const pcorr = require( 'compute-pcorr' );
+const isFeaturePullRequest = require("./isFeaturePullRequest")
 
 function daysBetween(date1, date2) {
     const diffTime = Math.abs(date2 - date1);

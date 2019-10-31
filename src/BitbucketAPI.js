@@ -1,10 +1,12 @@
 const fetch = require("node-fetch");
-
-let pagelen = 50
+const isFeaturePullRequest = require("./isFeaturePullRequest")
 
 module.exports = class BitbuketAPI {
 
-  constructor(authorization) {
+  constructor(authorization, filterByGitFlow = false, pageSize = 50) {
+    this.filterByGitFlow = filterByGitFlow
+    this.pageSize = pageSize
+
     if (authorization) {
       let headers = new fetch.Headers();
       let hash = Buffer.from(authorization.username + ":" + authorization.password).toString('base64')
@@ -40,16 +42,22 @@ module.exports = class BitbuketAPI {
   }
 
   async loadMergedPullRequests(repository, pagesToLoad) {
-    return this._loadPagesAt(
-      `https://api.bitbucket.org/2.0/repositories/${repository}/pullrequests?state=MERGED&pagelen=${pagelen}`, 
+    let pullRequests = await this._loadPagesAt(
+      `https://api.bitbucket.org/2.0/repositories/${repository}/pullrequests?state=MERGED&pagelen=${this.pageSize}`, 
       pagesToLoad
     )
+
+    if (this.filterByGitFlow) {
+      return pullRequests.filter(isFeaturePullRequest)
+    } else {
+      return pullRequests
+    }
   }
 
   async loadPullRequestsCommits(repository, pullRequest) {
     const pullRequestId = pullRequest.id
     return this._loadPagesAt(
-      `https://api.bitbucket.org/2.0/repositories/${repository}/pullrequests/${pullRequestId}/commits?pagelen=${pagelen}`,
+      `https://api.bitbucket.org/2.0/repositories/${repository}/pullrequests/${pullRequestId}/commits?pagelen=${this.pageSize}`,
       10000
     )
   }
@@ -57,7 +65,7 @@ module.exports = class BitbuketAPI {
   async loadPullRequestsActivity(repository, pullRequest) {
     const pullRequestId = pullRequest.id
     return this._loadPagesAt(
-      `https://api.bitbucket.org/2.0/repositories/${repository}/pullrequests/${pullRequestId}/activity?pagelen=${pagelen}`,
+      `https://api.bitbucket.org/2.0/repositories/${repository}/pullrequests/${pullRequestId}/activity?pagelen=${this.pageSize}`,
       10000
     )
   }
