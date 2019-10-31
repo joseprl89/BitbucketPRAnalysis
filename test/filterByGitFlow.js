@@ -11,7 +11,7 @@ describe('PullRequestAnalysis', () => {
             },
             destination: {
                 branch: {
-                    name: "feature/123"
+                    name: "develop"
                 }
             },
             commits: [{}],
@@ -59,6 +59,15 @@ describe('PullRequestAnalysis', () => {
         it('Removes merges to master', () => {
             var pr = samplePullRequest()
             pr.destination.branch.name = "master"
+            analysis = new PullRequestAnalysis([pr])
+            analysis.filterByGitFlow()
+    
+            assert.equal(analysis.measures.length, 0)
+        })
+
+        it('Removes merges to branches other than develop', () => {
+            var pr = samplePullRequest()
+            pr.destination.branch.name = "randomBranch"
             analysis = new PullRequestAnalysis([pr])
             analysis.filterByGitFlow()
     

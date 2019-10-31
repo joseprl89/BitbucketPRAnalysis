@@ -1,4 +1,5 @@
 var pcorr = require( 'compute-pcorr' );
+var isFeaturePullRequest = require("./isFeaturePullRequest")
 
 function daysBetween(date1, date2) {
     const diffTime = Math.abs(date2 - date1);
@@ -16,13 +17,7 @@ module.exports = class PullRequestAnalysis {
     }
 
     filterByGitFlow() {
-        this.data = this.data.filter(pr => {
-            return !(
-                pr.source.branch.name.startsWith('release/') || 
-                pr.source.branch.name.startsWith('hotfix/') ||
-                pr.destination.branch.name == "master"
-            ) 
-        })
+        this.data = this.data.filter(isFeaturePullRequest)
     }
 
     pearsonCorrelation() {
