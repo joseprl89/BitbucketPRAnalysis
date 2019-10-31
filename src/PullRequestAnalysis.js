@@ -10,14 +10,12 @@ function daysBetween(date1, date2) {
 module.exports = class PullRequestAnalysis {
     constructor(data) {
         this.data = data.filter(pr => pr.commits.length > 0)
-    }
-
-    get measures() {
-        return this.data.map(this.prToMeasure)
+        this.measures = this.data.map(this.prToMeasure)
     }
 
     filterByGitFlow() {
         this.data = this.data.filter(isFeaturePullRequest)
+        this.measures = this.data.map(this.prToMeasure)
     }
 
     pearsonCorrelation() {
@@ -60,7 +58,7 @@ module.exports = class PullRequestAnalysis {
         let approvalDate = approveActivity != null ? new Date(approveActivity.approval.date) : null
         let firstCommitDate = new Date(pr.commits.slice(-1)[0].date)
 
-        return {
+        const measure = {
             'Id': pr.id,
 
             'Time to merge code': daysBetween(firstCommitDate, mergeDate),
@@ -76,5 +74,7 @@ module.exports = class PullRequestAnalysis {
             'Activity count': pr.activity.length,
             'Merge commit count': pr.commits.slice(1).filter(commit => commit.parents.length > 1).length
         }
+        pr.measure = measure
+        return measure
     }
 }
